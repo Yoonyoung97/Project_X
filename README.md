@@ -7,8 +7,4 @@ Project_X
 >>김리나(@rina214)  
 >>최세영(@seyoung4503)  
 >>김민성(@neroil714)    
-  
-    
-      
-        
-        since 2020.1
+since 2020.1
