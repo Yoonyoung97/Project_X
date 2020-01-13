@@ -6,5 +6,5 @@ Project_X
 >>홍윤영(@yoonyoung97)  
 >>김리나(@rina214)  
 >>최세영(@seyoung4503)  
->>김민성(@neroil714)    
-<<since 2020.1
+>>김민성(@neroil714)  
+since 2020.1
