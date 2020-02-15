@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1092601636188",
+    "firebase_url": "https://hairnawa.firebaseio.com",
+    "project_id": "hairnawa",
+    "storage_bucket": "hairnawa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092601636188:android:ea4588b9e3a88ec0e58d99",
+        "android_client_info": {
+          "package_name": "com.example.hairnawa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1092601636188-v8qik171tccokli6imek352i8886afcj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hairnawa",
+            "certificate_hash": "17f304cebd8af9a2d7e7e8315d868f2d8eaca5cb"
+          }
+        },
+        {
+          "client_id": "1092601636188-qruq14hpio7dqsu5k2eh0161t9g5opu1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCL3iMheJr-1u9Nz4RD75WoBjT6r72mW6M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1092601636188-qruq14hpio7dqsu5k2eh0161t9g5opu1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
