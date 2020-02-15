@@ -10,4 +10,8 @@
     <string name="bottomNavi3_customer">스타일찾기</string>
     <string name="bottomNavi4_customer">나의뷰티샵</string>
     <string name="bottomNavi5_customer">예약현황</string>
+    <string name="Dailys">일간 현황</string>
+    <string name="Weeklys">주간 현황</string>
+    <string name="Monthlys">월간 현황</string>
+    <string name="Annuals">연간 현황</string>
 </resources>
