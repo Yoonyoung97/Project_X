@@ -5,11 +5,12 @@ android {
     buildToolsVersion "29.0.3"
     defaultConfig {
         applicationId "com.example.hairnawa"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -32,6 +33,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.2.2'
     implementation 'com.google.firebase:firebase-database:19.2.1'
     implementation 'com.google.firebase:firebase-core:17.2.2'
+
+    implementation 'com.google.firebase:firebase-firestore:21.4.0' //파이어스토어
+    implementation 'com.android.support:multidex:1.0.3'
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0' //차트
 }

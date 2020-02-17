@@ -15,7 +15,7 @@ public class ParentData {
         this.date = date;
         this.service= service;
         child = new Vector<>();
-        child.add(new com.example.hairnawa.ChildData(phoneNumber));
+        child.add(new ChildData(phoneNumber));
     }
 
     String getName() {

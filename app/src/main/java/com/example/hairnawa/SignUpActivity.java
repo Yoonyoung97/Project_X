@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,12 +20,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SignUpActivity extends AppCompatActivity {
@@ -36,9 +49,8 @@ public class SignUpActivity extends AppCompatActivity {
     private boolean idOK = false;
     private TextView doubleCheckResult;
 
-    DatabaseReference mUserReference  = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference userRef = mUserReference.child("Users");
-    //DatabaseReference Ref = mPostReference.child("password");
+    // Access a Cloud Firestore instance from your Activity
+    final FirebaseFirestore db = FirebaseFirestore.getInstance(); //파이어스토어
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,62 +99,28 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        userRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                //String id = dataSnapshot.getValue(String.class);
-                //Toast.makeText(SignActivity.this, id, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        userRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
         register.setOnClickListener(new View.OnClickListener() { //회원가입 버튼을 눌렀을 때
             @Override
             public void onClick(View v) {
-                userRef.addValueEventListener(new ValueEventListener() {
+
+                DocumentReference docRef = db.collection("User").document(id.getText().toString()); //아이디 중복확인 //아직 아이디에 특수문자 확인못함
+                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.child(id.getText().toString()).exists()) { //아이디가 데이터 베이스에 존재하고
-                            Toast.makeText(SignUpActivity.this, "아이디가 이미 존재합니다.", Toast.LENGTH_SHORT).show();
-                            idOK = false;
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                doubleCheckResult.setText("아이디가 이미 존재합니다.");
+                                doubleCheckResult.setTextColor(Color.RED);
+                                resultLayout.setVisibility(View.VISIBLE);
+                                idOK = false;
+                            }
+                        } else {
+                            Toast.makeText(SignUpActivity.this, "아이디 중복확인에 실패했습니다.", Toast.LENGTH_SHORT).show();
                         }
                     }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
                 });
+
                 if(TextUtils.isEmpty(id.getText())) {
                     Toast.makeText(SignUpActivity.this, "아이디를 입력해주세요.", Toast.LENGTH_SHORT).show();
                 }
@@ -179,19 +157,18 @@ public class SignUpActivity extends AppCompatActivity {
                             nameStr = name.getText().toString(),
                             emailStr = email.getText().toString(),
                             nicknameStr = nickname.getText().toString(),
-                            phoneNumberStr = phoneNumber.getText().toString(),
+                            phoneNumberStr = phoneNumber.getText().toString(), //폰번호 받을 때 "010-1234-5678"로 받아옴
                             businessNumberStr = "0000000000"; //고객님
-                    boolean isCEO = false; //고객님
+                    String position = "0"; //고객님
                     if(ceo.isChecked()) { //사장님
-                        isCEO = true;
+                        position = "1";
                         businessNumberStr = businessNumber.getText().toString();
                     }
-                    writeNewUser(idStr, nameStr, emailStr, passwordStr, nicknameStr, phoneNumberStr, isCEO, businessNumberStr);
-                    Toast.makeText(SignUpActivity.this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                    writeNewUser(idStr, nameStr, emailStr, passwordStr, nicknameStr, phoneNumberStr, position, businessNumberStr);
                     finish();
                 }
-            }
-        });
+            } //public void onClick
+        }); //register.setOnClickListener
 
         cancel.setOnClickListener(new View.OnClickListener() { //최소 버튼을 눌렀을 때
             @Override
@@ -200,43 +177,66 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-        doubleCheck.setOnClickListener(new View.OnClickListener() {
+        doubleCheck.setOnClickListener(new View.OnClickListener() { //아이디 중복확인
             @Override
             public void onClick(View v) {
-                userRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.child(id.getText().toString()).exists()) { //아이디가 데이터 베이스에 존재할 때
-                            doubleCheckResult.setText("아이디가 이미 존재합니다.");
-                            doubleCheckResult.setTextColor(Color.RED);
-                            resultLayout.setVisibility(View.VISIBLE);
-                            idOK = false;
-                        }
-                        else {
-                            doubleCheckResult.setText("이 아이디는 사용 가능합니다.");
-                            doubleCheckResult.setTextColor(Color.BLUE);
-                            resultLayout.setVisibility(View.VISIBLE);
 
-                            idOK = true;
+                DocumentReference docRef = db.collection("User").document(id.getText().toString());
+                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                doubleCheckResult.setText("아이디가 이미 존재합니다."); //아이디가 데이터 베이스에 존재할 때
+                                doubleCheckResult.setTextColor(Color.RED);
+                                resultLayout.setVisibility(View.VISIBLE);
+                                idOK = false;
+                            } else {
+                                doubleCheckResult.setText("이 아이디는 사용 가능합니다."); //아이디가 데이터 베이스에 존재하지 않을 때
+                                doubleCheckResult.setTextColor(Color.BLUE);
+                                resultLayout.setVisibility(View.VISIBLE);
+                                idOK = true;
+                            }
+                        } else {
+                            Toast.makeText(SignUpActivity.this, "중복확인에 실패했습니다.", Toast.LENGTH_SHORT).show();
                         }
                     }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                }); //docRef.get().addOnCompleteListener
 
+            } //onClick
+        }); //doubleCheck.setOnClickListener
+
+    } //protected void onStart()
+
+    private void writeNewUser(String userID, String name, String email, String password,  String nickname, String phoneNumber, String position, String businessNumber) {
+        //User user = new User(name, email, password, nickname, phoneNumber, position, businessNumber, userID);
+
+        // Create a new user with a first and last name
+        Map<String, Object> user = new HashMap<>();
+        user.put("BusinessNumber", businessNumber);
+        user.put("email", email);
+        user.put("name", name);
+        user.put("nickname", nickname);
+        user.put("phone-number", phoneNumber);
+        user.put("position", position);
+        user.put("userID", userID);
+        user.put("userPwd", password);
+
+        db.collection("User") //User Collection
+                .document(userID) //userID의 Document
+                .set(user) //user가 입력한 정보를 파이어베이스에 등록
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(SignUpActivity.this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(SignUpActivity.this, "회원가입에 실패하였습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
-            }
-        });
-
-    }
-
-    private void writeNewUser(String userId, String name, String email, String password,  String nickname, String phoneNumber, boolean isCEO, String businessNumber) {
-        User user = new User(name, email, password, nickname, phoneNumber, isCEO, businessNumber);
-        userRef.child(userId).setValue(user);
-    }
-
-    /*private void updateUserName(String userId, String newName) {
-        mPostReference.child("Users").child(userId).child("username").setValue(newName);
-    }*/
-
+    } //private void writeNewUser
 }

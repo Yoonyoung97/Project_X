@@ -2,30 +2,29 @@ package com.example.hairnawa;
 
 public class User {
 
-    public String username, email, nickname, phoneNumber, businessNumber;
-    public String password; //private로는 값 못가져오나..?
-    public boolean isCEO;
+    public String name, email, nickname, phoneNumber, businessNumber, userID, position;
+    public String userPwd; //private로는 값 못가져오나..?
+    //public boolean isCEO;
 
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String username, String email, String password, String nickname, String phoneNumber, boolean isCEO, String businessNumber) {
-        this.username = username;
+    public User(String name, String email, String userPwd, String nickname, String phoneNumber, String position, String businessNumber, String userID) {
+        this.name = name;
         this.email = email;
-        this.password = password;
+        this.userPwd = userPwd;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
-        this.isCEO = isCEO;
+        this.position = position;
         this.businessNumber = businessNumber;
+        this.userID = userID;
     }
 
-    public String getPassword() {
-        return password;
+    public String getUserPwd() {
+        return userPwd;
     }
-    public boolean getIsCEO() { return isCEO; }
-
-
+    public String getPosition() { return position; }
 
 }

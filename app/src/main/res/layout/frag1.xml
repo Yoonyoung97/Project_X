@@ -32,24 +32,28 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/sales"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="매출"
                 android:layout_weight="1"/>
 
             <Button
+                android:id="@+id/numberOfCustomer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="고객수"
                 android:layout_weight="1"/>
 
             <Button
+                android:id="@+id/averageSales"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="인당 평균매출"
                 android:layout_weight="1"/>
 
             <Button
+                android:id="@+id/materialCost"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="재료비"
