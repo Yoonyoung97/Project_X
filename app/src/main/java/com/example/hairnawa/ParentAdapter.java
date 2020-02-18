@@ -32,7 +32,7 @@ public class ParentAdapter extends BaseExpandableListAdapter {
 
         TextView header = convertView.findViewById(R.id.list1);
         String date = data.get(groupPosition).getDate().substring(8,10) + ":" + data.get(groupPosition).getDate().substring(10,12);
-        String reservation = date + " : " + data.get(groupPosition).getName() + " 고객님 (" + data.get(groupPosition).getService() + ")";
+        String reservation = date + " : " + data.get(groupPosition).getName() + " 고객님 " + data.get(groupPosition).getService();
         header.setText(reservation);
 
         return convertView;
