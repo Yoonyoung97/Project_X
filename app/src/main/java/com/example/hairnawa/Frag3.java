@@ -1,8 +1,6 @@
 package com.example.hairnawa;
 
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -31,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Vector;
 
 public class Frag3 extends Fragment {
@@ -41,7 +35,7 @@ public class Frag3 extends Fragment {
     private ExpandableListView expandableListView;
     private static Vector<ParentData> reservationDataList = new Vector<>();
     private static int numberOfReservation = 0;
-    private static Vector<String> strDate = new Vector<>();
+    private static Vector<String> strDate = new Vector<>(), price = new Vector<>();
     private static Vector<ArrayList<String>> surgery = new Vector<>();
 
     final FirebaseFirestore db = FirebaseFirestore.getInstance(); //파이어스토어
@@ -57,11 +51,13 @@ public class Frag3 extends Fragment {
         description = view.findViewById(R.id.description);
         expandableListView = view.findViewById(R.id.listView);
 
+        Date currentTime = Calendar.getInstance().getTime();
+        InitializeData(new SimpleDateFormat("yyyy.MM.dd").format(currentTime));
+
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() { //날짜를 선택할 때 마다 호출됨
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 String calendarDate = Integer.toString(year) + '.' + Integer.toString(month + 1) + '.' + dayOfMonth; //yyyy.MM.dd
-                date.setText(calendarDate);
                 InitializeData(calendarDate);
             }
         });
@@ -71,10 +67,12 @@ public class Frag3 extends Fragment {
 
     public void InitializeData(String calendarDate)
     {
+        date.setText(calendarDate);
         reservationDataList = new Vector<>();
         numberOfReservation = 0;
         strDate = new Vector<>();
         surgery = new Vector<>();
+        price = new Vector<>();
         description.setText("예약정보를 불러오는 중입니다.");
 
         Date findDate = new Date(), findDate2 = new Date();
@@ -109,6 +107,7 @@ public class Frag3 extends Fragment {
                                 Date getDate = document.getDate("time");
                                 strDate.add(new SimpleDateFormat("yyyyMMddHHmm").format(getDate));
                                 surgery.add((ArrayList<String>) document.getData().get("Surgery"));
+                                price.add(String.valueOf(document.getData().get("price")));
                                 String guestID = document.getString("guestID");
                                 db.collection("User")
                                         .document(guestID)
@@ -124,7 +123,8 @@ public class Frag3 extends Fragment {
                                                             documentSnapshot.getString("name"), //고객님 이름
                                                             strDate.remove(0), //예약 날짜
                                                             surgery.remove(0).toString(), //서비스
-                                                            documentSnapshot.getString("phone-number"))); //폰번호
+                                                            documentSnapshot.getString("phone-number"), //폰번호
+                                                            price.remove(0))); //가격
                                                     if(strDate.isEmpty()) { //모든 예약을 reservationDataList에 추가했을 때
                                                         expandableListView.setAdapter(new ParentAdapter(getContext(), reservationDataList)); //없으면 실행 잘 안됨
                                                     }

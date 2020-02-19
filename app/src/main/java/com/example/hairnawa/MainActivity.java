@@ -3,7 +3,6 @@ package com.example.hairnawa;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
     private com.example.hairnawa.Frag3 frag3;
     private com.example.hairnawa.Frag4 frag4;
     private com.example.hairnawa.Frag5 frag5;
-    private ListView listView;
     private String id;
 
     @Override
@@ -63,19 +61,10 @@ public class MainActivity extends AppCompatActivity {
         frag4 = new com.example.hairnawa.Frag4();
         frag5 = new com.example.hairnawa.Frag5();
         setFrag(1); //첫 프래그먼트 화면을 무엇으로 지정해줄 것인지 선택
-
-//        listView = findViewById(R.id.list); //프래그가서 쓰기
-//        List<String> data = new ArrayList<>();
-//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, data);
-//        listView.setAdapter(adapter);
-//        data.add("리나");
-//        data.add("리나2");
-//        data.add("리나3");
-//        adapter.notifyDataSetChanged(); // 저장
     }
 
     //프래그먼트 교체가 일어나는 실행문
-    private void setFrag(int n) {
+    public void setFrag(int n) { //홈에서 setFrag 함수를 쓰기위해 public으로 함
         fm = getSupportFragmentManager();
         ft = fm.beginTransaction();
 

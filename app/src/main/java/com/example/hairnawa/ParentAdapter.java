@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Vector;
@@ -16,6 +17,7 @@ public class ParentAdapter extends BaseExpandableListAdapter {
     private Context context;
     private Vector<ParentData> data;
     private LayoutInflater inflater = null;
+    private ImageView iv_arrow;
 
     public ParentAdapter(Context context, Vector<ParentData> data){
         this.data = data;
@@ -34,6 +36,12 @@ public class ParentAdapter extends BaseExpandableListAdapter {
         String date = data.get(groupPosition).getDate().substring(8,10) + ":" + data.get(groupPosition).getDate().substring(10,12);
         String reservation = date + " : " + data.get(groupPosition).getName() + " 고객님 " + data.get(groupPosition).getService();
         header.setText(reservation);
+        iv_arrow = convertView.findViewById(R.id.iv_arrow);
+        if(isExpanded){
+            iv_arrow.setImageResource(R.drawable.ic_expand_less_black_24dp);
+        } else {
+            iv_arrow.setImageResource(R.drawable.ic_expand_more_black_24dp);
+        }
 
         return convertView;
     }
@@ -46,7 +54,10 @@ public class ParentAdapter extends BaseExpandableListAdapter {
         }
 
         TextView content = convertView.findViewById(R.id.list_more);
-        content.setText(data.get(groupPosition).child.get(childPosition).getPhoneNumber());
+        String reservationInformation
+                = "폰 번호: " + data.get(groupPosition).child.get(childPosition).getPhoneNumber()
+                + "\n가격: " + data.get(groupPosition).child.get(childPosition).getPrice() + "원";
+        content.setText(reservationInformation);
 
         return convertView;
     }

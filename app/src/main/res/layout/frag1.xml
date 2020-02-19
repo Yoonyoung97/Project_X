@@ -19,6 +19,7 @@
             android:layout_gravity="right"/>
 
         <TextView
+            android:id="@+id/tv_feedback"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -81,6 +82,7 @@
                 android:layout_marginLeft="20dp"/>
 
             <Button
+                android:id="@+id/btn_reservationMore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="자세히보기"
@@ -89,7 +91,7 @@
         </LinearLayout>
 
         <ListView
-            android:id="@+id/list"
+            android:id="@+id/lv_reservation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

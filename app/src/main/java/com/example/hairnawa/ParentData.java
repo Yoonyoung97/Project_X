@@ -10,12 +10,12 @@ public class ParentData {
 
     public Vector<ChildData> child;
 
-    public ParentData(String name, String date, String service, String phoneNumber) {
+    public ParentData(String name, String date, String service, String phoneNumber, String price) {
         this.name= name;
         this.date = date;
         this.service= service;
         child = new Vector<>();
-        child.add(new ChildData(phoneNumber));
+        child.add(new ChildData(phoneNumber, price));
     }
 
     String getName() {
