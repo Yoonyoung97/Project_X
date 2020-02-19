@@ -1,6 +1,8 @@
 package com.example.hairnawa;
 
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +16,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -26,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 
 public class Frag3 extends Fragment {
@@ -51,14 +57,15 @@ public class Frag3 extends Fragment {
         description = view.findViewById(R.id.description);
         expandableListView = view.findViewById(R.id.listView);
 
-        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() { //날짜를 선택할 때 마다 호출됨
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                String calendarDate = Integer.toString(year) + '.' +Integer.toString(month + 1) + '.' + dayOfMonth; //yyyy.MM.dd
+                String calendarDate = Integer.toString(year) + '.' + Integer.toString(month + 1) + '.' + dayOfMonth; //yyyy.MM.dd
                 date.setText(calendarDate);
                 InitializeData(calendarDate);
             }
         });
+
         return view;
     }
 
@@ -90,54 +97,49 @@ public class Frag3 extends Fragment {
         colRef.whereGreaterThanOrEqualTo("time", findDate) //선택한 날부터
                 .whereLessThan("time", findDate2) //다음날 전까지
                 .orderBy("time") //시간 순서대로
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Date getDate = document.getDate("time");
-                        strDate.add(new SimpleDateFormat("yyyyMMddHHmm").format(getDate));
-                        surgery.add((ArrayList<String>) document.getData().get("Surgery"));
-                        String guestID = document.getString("guestID");
-                        db.collection("User")
-                                .document(guestID)
-                                .get()
-                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            DocumentSnapshot document = task.getResult();
-                                            if (document.exists()) {
-                                                reservationDataList.add(new ParentData(
-                                                        document.getString("name"), //고객님 이름
-                                                        strDate.remove(0), //예약 날짜
-                                                        surgery.remove(0).toString(), //서비스
-                                                        document.getString("phone-number"))); //폰번호
-                                            } else {
-                                                Toast.makeText(getContext(), "고객님의 ID를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+                .addSnapshotListener(new EventListener<QuerySnapshot>() { //콜백 리스너
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Toast.makeText(getContext(), "데이터를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            if (document.get("time") != null && document.get("guestID") != null) {
+                                Date getDate = document.getDate("time");
+                                strDate.add(new SimpleDateFormat("yyyyMMddHHmm").format(getDate));
+                                surgery.add((ArrayList<String>) document.getData().get("Surgery"));
+                                String guestID = document.getString("guestID");
+                                db.collection("User")
+                                        .document(guestID)
+                                        .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                                if (e != null) {
+                                                    Toast.makeText(getContext(), "데이터를 부르지 못했습니다.", Toast.LENGTH_SHORT).show();
+                                                    return;
+                                                }
+                                                if (documentSnapshot != null && documentSnapshot.exists()) {
+                                                    reservationDataList.add(new ParentData( //reservationDataList에 추가
+                                                            documentSnapshot.getString("name"), //고객님 이름
+                                                            strDate.remove(0), //예약 날짜
+                                                            surgery.remove(0).toString(), //서비스
+                                                            documentSnapshot.getString("phone-number"))); //폰번호
+                                                    if(strDate.isEmpty()) { //모든 예약을 reservationDataList에 추가했을 때
+                                                        expandableListView.setAdapter(new ParentAdapter(getContext(), reservationDataList)); //없으면 실행 잘 안됨
+                                                    }
+                                                } else {
+                                                    Toast.makeText(getContext(), "데이터가 없습니다.", Toast.LENGTH_SHORT).show();
+                                                }
                                             }
-                                        } else {
-                                            Toast.makeText(getContext(), "고객님의 ID를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                });
-                        long lastTime = System.currentTimeMillis(),
-                                deleyTime = 500,
-                                nowTime = System.currentTimeMillis();
-                        while(lastTime + deleyTime > nowTime) {
-                            nowTime = System.currentTimeMillis();
-                        } //데이터 불러오기 위한 지연시간
-                        numberOfReservation++;
-                    } //for (QueryDocumentSnapshot document : task.getResult())
-                } else {
-
-                }
-                ParentAdapter adapter = new ParentAdapter(getContext(), reservationDataList);
-                expandableListView.setAdapter(adapter);
-                description.setText(numberOfReservation + "개의 예약이 있습니다.");
-            }
-        }); //colRef ... .addOnCompleteListener
+                                        });
+                            } //if (document.get("time") != null && document.get("guestID") != null)
+                            numberOfReservation++;
+                        } //for (QueryDocumentSnapshot document : queryDocumentSnapshots)
+                        expandableListView.setAdapter(new ParentAdapter(getContext(), reservationDataList)); //데이터가 없을 때
+                        description.setText(numberOfReservation + "개의 예약이 있습니다.");
+                    } //public void onEvent
+                }); //colRef. ... .addSnapshotListener(new EventListener<QuerySnapshot>()
     } //public void InitializeData
 }
 

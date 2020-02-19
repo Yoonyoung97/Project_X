@@ -3,6 +3,7 @@ package com.example.hairnawa;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +34,7 @@ public class SignActivity extends AppCompatActivity {
 
     private Button login, findId, findPassword, signUp; //아이디 찾기, 비밀번호 찾기는 나중에
     private EditText id, password;
+    private long mLastClickTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,8 @@ public class SignActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() { //로그인 버튼을 눌렀을 때
             @Override
             public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) { return; } //버튼 중복 클릭 방지
+                mLastClickTime = SystemClock.elapsedRealtime();
 
                 if(TextUtils.isEmpty(id.getText())) { //아이디 입력칸이 비어있으면
                     Toast.makeText(SignActivity.this, "아이디를 입력해주세요.", Toast.LENGTH_SHORT).show();

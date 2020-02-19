@@ -2,6 +2,7 @@ package com.example.hairnawa;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -48,6 +49,7 @@ public class SignUpActivity extends AppCompatActivity {
     private LinearLayout businessLayout, resultLayout;
     private boolean idOK = false;
     private TextView doubleCheckResult;
+    private long mLastClickTime = 0;
 
     // Access a Cloud Firestore instance from your Activity
     final FirebaseFirestore db = FirebaseFirestore.getInstance(); //파이어스토어
@@ -102,6 +104,8 @@ public class SignUpActivity extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() { //회원가입 버튼을 눌렀을 때
             @Override
             public void onClick(View v) {
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) { return; } //버튼 중복 클릭 방지
+                mLastClickTime = SystemClock.elapsedRealtime();
 
                 DocumentReference docRef = db.collection("User").document(id.getText().toString()); //아이디 중복확인 //아직 아이디에 특수문자 확인못함
                 docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
