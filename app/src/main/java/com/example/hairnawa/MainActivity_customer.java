@@ -6,11 +6,14 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity_customer extends AppCompatActivity {
 
@@ -22,8 +25,9 @@ public class MainActivity_customer extends AppCompatActivity {
     private com.example.hairnawa.Frag3_customer frag3_customer;
     private com.example.hairnawa.Frag4_customer frag4_customer;
     private com.example.hairnawa.Frag5_customer frag5_customer;
-    private ListView listView;
     private String id;
+    private Toolbar toolbar_customer;
+    private TabLayout tabs_customer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,30 +37,6 @@ public class MainActivity_customer extends AppCompatActivity {
         Intent homeIntent = getIntent();
         id = homeIntent.getStringExtra("id"); //Intent에서 ID를 받아옴
 
-        bottomNavigationView = findViewById(R.id.bottomNavi_customer);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch(menuItem.getItemId()) {
-                    case R.id.bottomNavi1_customer:
-                        setFrag(1);
-                        break;
-                    case R.id.bottomNavi2_customer:
-                        setFrag(2);
-                        break;
-                    case R.id.bottomNavi3_customer:
-                        setFrag(3);
-                        break;
-                    case R.id.bottomNavi4_customer:
-                        setFrag(4);
-                        break;
-                    case R.id.bottomNavi5_customer:
-                        setFrag(5);
-                        break;
-                }
-                return true;
-            }
-        });
         frag1_customer = new com.example.hairnawa.Frag1_customer();
         frag2_customer = new com.example.hairnawa.Frag2_customer();
         frag3_customer = new com.example.hairnawa.Frag3_customer();
@@ -64,14 +44,55 @@ public class MainActivity_customer extends AppCompatActivity {
         frag5_customer = new com.example.hairnawa.Frag5_customer();
         setFrag(1); //첫 프래그먼트 화면을 무엇으로 지정해줄 것인지 선택
 
-//        listView = findViewById(R.id.list); //프래그가서 쓰기
-//        List<String> data = new ArrayList<>();
-//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, data);
-//        listView.setAdapter(adapter);
-//        data.add("리나");
-//        data.add("리나2");
-//        data.add("리나3");
-//        adapter.notifyDataSetChanged(); // 저장
+        toolbar_customer = findViewById(R.id.toolbar_customer);
+        setSupportActionBar(toolbar_customer);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false); //기존 타이틀을 보이지 않게 함
+
+        tabs_customer = findViewById(R.id.tabs_customer);
+        tabs_customer.addTab(tabs_customer.newTab().setText(R.string.bottomNavi1_customer));
+        tabs_customer.addTab(tabs_customer.newTab().setText(R.string.bottomNavi2_customer));
+        tabs_customer.addTab(tabs_customer.newTab().setText(R.string.bottomNavi3_customer));
+        tabs_customer.addTab(tabs_customer.newTab().setText(R.string.bottomNavi4_customer));
+        tabs_customer.addTab(tabs_customer.newTab().setText(R.string.bottomNavi5_customer));
+
+        tabs_customer.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                //선택된 탭 번호 반환
+                int position = tab.getPosition();
+
+                switch (position) {
+                    case 0:
+                        setFrag(1);
+                        break;
+                    case 1:
+                        setFrag(2);
+                        break;
+                    case 2:
+                        setFrag(3);
+                        break;
+                    case 3:
+                        setFrag(4);
+                        break;
+                    case 4:
+                        setFrag(5);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     //프래그먼트 교체가 일어나는 실행문

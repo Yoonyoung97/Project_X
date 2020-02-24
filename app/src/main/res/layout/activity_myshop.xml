@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity">
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/img1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="75dp"
+                android:src="@drawable/img3" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="신세경 디자이너"
+                android:layout_gravity="center_vertical"
+                android:textSize="20dp"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:paddingLeft="50dp"
+                android:text="부산광역시 어디어디" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:paddingLeft="50dp"
+                android:text="내용추가 내용추가 내용추가 내용추가 내용추가" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="45dp"
+                android:text="디자이너 이력"
+                android:textSize="20dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:paddingLeft="50dp"
+                android:text="2019 황금 종려상\n2019 아카데미 작품상\n2019 각본상\n2019 Los Angeles Film Award for Best Director"/>
+            <TextView
+                android:layout_marginTop="7dp"
+                android:layout_marginBottom="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="45dp"
+                android:text="단골고객 리뷰"
+                android:textSize="20dp"/>
+        </LinearLayout>
+
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:weightSum="2"
+                android:layout_margin="0dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="100dp"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:scaleType="centerCrop"
+                        android:id="@+id/img_1"
+                        android:padding="5dp"
+                        android:src="@drawable/img1" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="100dp"
+                        android:layout_margin="1dp"
+                        android:scaleType="centerCrop"
+                        android:id="@+id/img_2"
+                        android:layout_weight="1"
+                        android:padding="5dp"
+                        android:src="@drawable/img2" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="100dp"
+                        android:scaleType="centerCrop"
+                        android:id="@+id/img_3"
+                        android:layout_margin="1dp"
+                        android:layout_weight="1"
+                        android:padding="5dp"
+                        android:src="@drawable/img1" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3"
+                    android:layout_margin="3dp">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="100dp"
+                        android:layout_margin="1dp"
+                        android:padding="5dp"
+                        android:scaleType="centerCrop"
+                        android:id="@+id/img_4"
+                        android:layout_weight="1"
+                        android:src="@drawable/img2" />
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="100dp"
+                        android:layout_margin="1dp"
+                        android:scaleType="centerCrop"
+                        android:id="@+id/img_5"
+                        android:padding="5dp"
+                        android:src="@drawable/img1"
+                        android:layout_weight="1"/>
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="100dp"
+                        android:layout_margin="1dp"
+                        android:scaleType="centerCrop"
+                        android:id="@+id/img_6"
+                        android:padding="5dp"
+                        android:src="@drawable/img2"
+                        android:layout_weight="1"/>
+                </LinearLayout>
+
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/expanded_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_marginTop="7dp"
+                android:layout_marginBottom="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="45dp"
+                android:text="오시는 길"
+                android:textSize="20dp"/>
+
+            <fragment
+                android:id="@+id/googleMap"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginHorizontal="20dp"
+                class="com.google.android.gms.maps.MapFragment"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</ScrollView>

@@ -21,6 +21,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".SignUpActivity"/>
+        <activity android:name=".MyShopActivity"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCtpG-DuvWEbce0tw21Z_I3DAkrRchMTdc"/>
     </application>
 
 </manifest>

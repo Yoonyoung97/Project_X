@@ -23,6 +23,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,16 +41,24 @@ import java.util.Vector;
 
 public class Frag1 extends Fragment {
     private View view;
-    private Button myShop, sales, numberOfCustomer, averageSales, materialCost, btn_reservationMore;
+    private Button sales, numberOfCustomer, averageSales, materialCost, btn_reservationMore;
     private LineChart lineChart;
-    private TextView tv_feedback;
+    //private TextView tv_feedback;
     private ListView lv_reservation;
+    private TextView tv_noReservation;
     private static ArrayList<String> reservationList;
     private static Vector<String> strTime = new Vector<>();
     private static Vector<ArrayList<String>> surgery = new Vector<>();
     private static ArrayAdapter<String> adapter;
+    private static List<Entry> entries;
+    private static ArrayList<String> labels; //레이블 왜 있는거지..?
 
     final FirebaseFirestore db = FirebaseFirestore.getInstance(); //파이어스토어
+    final CollectionReference recordRef = db.collection("User")
+            .document("2ttvmnVOCqVtiwyWPMzf") //사장님 아이디로 바꿔야함
+            .collection("shop")
+            .document("5NrbvMcs1XzQVOenQaec")
+            .collection("record");
 
     @Nullable
     @Override
@@ -57,21 +66,22 @@ public class Frag1 extends Fragment {
         view = inflater.inflate(R.layout.frag1, container, false);
         final String id = getArguments().getString("id"); //아이디를 받아옴
 
-        myShop = view.findViewById(R.id.myShop);
         sales = view.findViewById(R.id.sales);
         numberOfCustomer = view.findViewById(R.id.numberOfCustomer);
         averageSales = view.findViewById(R.id.averageSales);
         materialCost = view.findViewById(R.id.materialCost);
         lineChart = view.findViewById(R.id.chart);
-        tv_feedback = view.findViewById(R.id.tv_feedback);
+        //tv_feedback = view.findViewById(R.id.tv_feedback);
         btn_reservationMore = view.findViewById(R.id.btn_reservationMore);
         lv_reservation = view.findViewById(R.id.lv_reservation);
+        tv_noReservation = view.findViewById(R.id.tv_noReservation);
 
         reservationList = new ArrayList<>(); //오늘의 예약 손님 정보 보여줌
         adapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, reservationList);
         lv_reservation.setAdapter(adapter);
+        tv_noReservation.setVisibility(View.GONE);
 
-        db.collection("User").document(id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        /*db.collection("User").document(id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -85,13 +95,13 @@ public class Frag1 extends Fragment {
                     Toast.makeText(getContext(), "데이터가 없습니다.", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        });*/
 
         Calendar mCalendar = Calendar.getInstance();
         Date today = mCalendar.getTime(); //오늘
         mCalendar.add(Calendar.DAY_OF_WEEK, 1);
         Date tomorrow = mCalendar.getTime(); //내일
-        db.collection("User")
+        db.collection("User") //오늘의 예약 리스트를 얻어옴
                 .document("2ttvmnVOCqVtiwyWPMzf") //사장님 아이디로 바꿔야함
                 .collection("shop")
                 .document("5NrbvMcs1XzQVOenQaec")
@@ -104,6 +114,9 @@ public class Frag1 extends Fragment {
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (e != null) {
                             Toast.makeText(getContext(), "데이터를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+                            return;
+                        } else if(queryDocumentSnapshots.isEmpty()) {
+                            tv_noReservation.setVisibility(View.VISIBLE); //오늘 예약이 없으면 이 TextView를 보여줌
                             return;
                         }
                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
@@ -137,21 +150,15 @@ public class Frag1 extends Fragment {
                                         });
                             } //if (document.get("time") != null && document.get("guestID") != null)
                         } //for (QueryDocumentSnapshot document : queryDocumentSnapshots)
-                        adapter.notifyDataSetChanged(); // 저장
+                        adapter.notifyDataSetChanged(); // reservationList 저장
                     } //public void onEvent
                 }); //db.collection("User"). ... .addSnapshotListener
 
-        myShop.setOnClickListener(new View.OnClickListener() {
+        btn_reservationMore.setOnClickListener(new View.OnClickListener() { //자세히보기 버튼을 누르면
             @Override
             public void onClick(View v) {
-                //나의 샵(샵 소개 페이지?)으로 이동
-            }
-        });
-
-        btn_reservationMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MainActivity)getActivity()).setFrag(3); //자세히보기 버튼을 누르면 예약현황으로 넘어감
+                //((MainActivity)getActivity()).setFrag(3);
+                ((MainActivity)getActivity()).tabs.selectTab(((MainActivity)getActivity()).tabs.getTabAt(2), true); //예약현황으로 넘어감
             }
         });
 
@@ -160,51 +167,127 @@ public class Frag1 extends Fragment {
         averageSales.setOnClickListener(myListener);
         materialCost.setOnClickListener(myListener);
 
-        sales.setSelected(true);
-
-        List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(1,0f));
-        entries.add(new Entry(2,0f));
-        entries.add(new Entry(3,1f));
-        entries.add(new Entry(4,4f));
-        entries.add(new Entry(5,10f));
-        entries.add(new Entry(6,4f));
-        entries.add(new Entry(7,4f));
-        entries.add(new Entry(8,5f));
-        entries.add(new Entry(9,8f));
-        entries.add(new Entry(10,7f));
-        entries.add(new Entry(11,10f));
-        entries.add(new Entry(12,8f));
-
-
-        final ArrayList<String> labels = new ArrayList<>();
-        labels.add("January");
-        labels.add("February");
-        labels.add("March");
-        labels.add("April");
-        labels.add("May");
-        labels.add("June");
-        labels.add("July");
-        labels.add("August");
-        labels.add("September");
-        labels.add("October");
-        labels.add("November");
-        labels.add("December");
-
-        graphDrawing(entries, labels, "매출");
+        entries = new ArrayList<>();
+        monthlySales();
 
         return view;
     }
 
-    public void graphDrawing(List<Entry> entries, final ArrayList<String> labels, String label) {
+    View.OnClickListener myListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            //TextView titleText = view.findViewById(R.id.titleText);
+            sales.setSelected(false);
+            sales.setBackgroundResource(R.drawable.nonclicked_border);
+            numberOfCustomer.setSelected(false);
+            numberOfCustomer.setBackgroundResource(R.drawable.nonclicked_border);
+            averageSales.setSelected(false);
+            averageSales.setBackgroundResource(R.drawable.nonclicked_border);
+            materialCost.setSelected(false);
+            materialCost.setBackgroundResource(R.drawable.nonclicked_border);
+
+            entries = new ArrayList<>();
+            labels = new ArrayList<>();
+
+            switch (view.getId()) {
+                case R.id.sales: //매출 버튼을 눌렀을 때
+                    sales.setSelected(true);
+                    sales.setBackgroundResource(R.drawable.clicked_border);
+                    monthlySales();
+                    break;
+                case R.id.numberOfCustomer: //고객 수 버튼을 눌렀을 때
+                    numberOfCustomer.setSelected(true);
+                    numberOfCustomer.setBackgroundResource(R.drawable.clicked_border);
+                    monthlyNumberOfCustomer();
+                    break;
+                case R.id.averageSales: //인당 평균 매출 버튼을 눌렀을 때
+                    averageSales.setSelected(true);
+                    averageSales.setBackgroundResource(R.drawable.clicked_border);
+                    monthlyAverageSales();
+                    break;
+                case R.id.materialCost: //재료비 버튼을 눌렀을 때
+                    materialCost.setSelected(true);
+                    materialCost.setBackgroundResource(R.drawable.clicked_border);
+                    monthlyMaterialCost();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    public void monthlySales(){
+        recordRef.orderBy("month")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Toast.makeText(getContext(), "데이터를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            if (document.get("price") != null && document.get("month") != null) {
+                                entries.add(new Entry((long)document.getData().get("month"), (long)(document.getData().get("price"))));
+                            }
+                        }
+                        graphDrawing(entries, labels, "매출");
+                    }
+                });
+    }
+
+    public void monthlyNumberOfCustomer() {
+        recordRef.orderBy("month")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Toast.makeText(getContext(), "데이터를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            if (document.get("customer") != null && document.get("month") != null) {
+                                entries.add(new Entry((long)document.getData().get("month"), (long)(document.getData().get("customer"))));
+                            }
+                        }
+                        graphDrawing(entries, labels, "고객수");
+                    }
+                });
+    }
+
+    public void monthlyAverageSales() {
+        recordRef.orderBy("month")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Toast.makeText(getContext(), "데이터를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            if (document.get("customer") != null && document.get("price") != null && document.get("month") != null) {
+                                float averageSales = (long)(document.getData().get("price")) / (long)(document.getData().get("customer")); //인당 평균매출 = 매출 / 고객수
+                                entries.add(new Entry((long)document.getData().get("month"), averageSales));
+                            }
+                        }
+                        graphDrawing(entries, labels, "인당 평균매출");
+                    }
+                });
+    }
+
+    public void monthlyMaterialCost() {
+
+    }
+
+    public void graphDrawing(List<Entry> entries, final ArrayList<String> labels, String label) { //그래프 그리기
+
         lineChart = view.findViewById(R.id.chart);
 
         LineDataSet lineDataSet = new LineDataSet(entries, label);
         lineDataSet.setLineWidth(2);
         lineDataSet.setCircleRadius(6);
-        lineDataSet.setCircleColor(Color.parseColor("#9370db"));
+        lineDataSet.setCircleColor(Color.parseColor("#7C4DFF"));
         lineDataSet.setCircleHoleColor(Color.WHITE);
-        lineDataSet.setColor(Color.parseColor("#9370db"));
+        lineDataSet.setColor(Color.parseColor("#7C4DFF"));
         lineDataSet.setDrawCircleHole(true);
         lineDataSet.setDrawCircles(true);
         lineDataSet.setDrawHorizontalHighlightIndicator(false);
@@ -216,12 +299,12 @@ public class Frag1 extends Fragment {
 
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);//XAxis.XAxisPosition.BOTTOM_INSIDE
-        xAxis.setTextColor(Color.parseColor("#9370db"));
+        xAxis.setTextColor(Color.parseColor("#7C4DFF"));
         xAxis.enableGridDashedLine(8, 24, 0);
 
 
         YAxis yLAxis = lineChart.getAxisLeft();
-        yLAxis.setTextColor(Color.GRAY);
+        yLAxis.setTextColor(Color.parseColor("#7C4DFF"));
 
         YAxis yRAxis = lineChart.getAxisRight();
         yRAxis.setDrawLabels(false);
@@ -246,32 +329,4 @@ public class Frag1 extends Fragment {
         lineChart.setMarker(marker);
         xAxis.setGranularityEnabled(true);
     }
-
-    View.OnClickListener myListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            //TextView titleText = view.findViewById(R.id.titleText);
-            sales.setSelected(false);
-            numberOfCustomer.setSelected(false);
-            averageSales.setSelected(false);
-            materialCost.setSelected(false);
-
-            switch (view.getId()) {
-                case R.id.sales:
-
-                    break;
-                case R.id.numberOfCustomer:
-
-                    break;
-                case R.id.averageSales:
-
-                    break;
-                case R.id.materialCost:
-
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 }
