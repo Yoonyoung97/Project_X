@@ -2,6 +2,7 @@ package com.example.hairnawa;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.Matrix4f;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     public TabLayout tabs;
 
+    public static MainActivity mainActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent homeIntent = getIntent();
         id = homeIntent.getStringExtra("id"); //Intent에서 ID를 받아옴
+        mainActivity = MainActivity.this;
 
         frag1 = new com.example.hairnawa.Frag1(); //홈
         frag2 = new com.example.hairnawa.Frag2(); //샵현황
@@ -147,7 +151,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             case R.id.action_menu2: { //설정을 눌렀을 때
-                Toast.makeText(this, "설정", Toast.LENGTH_SHORT).show();
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 break;
             }
             default:

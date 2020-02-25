@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ public class SignActivity extends AppCompatActivity {
 
     private Button login, findId, findPassword, signUp; //아이디 찾기, 비밀번호 찾기는 나중에
     private EditText id, password;
+    private CheckBox cb_login;
     private long mLastClickTime = 0;
 
     @Override
@@ -51,9 +53,9 @@ public class SignActivity extends AppCompatActivity {
         findId = findViewById(R.id.findId);
         findPassword = findViewById(R.id.findPassword);
         signUp = findViewById(R.id.signUp);
-
         id = findViewById(R.id.loginId);
         password = findViewById(R.id.loginPassword);
+        cb_login = findViewById(R.id.cb_login);
 
         login.setOnClickListener(new View.OnClickListener() { //로그인 버튼을 눌렀을 때
             @Override
@@ -75,13 +77,15 @@ public class SignActivity extends AppCompatActivity {
                                 DocumentSnapshot document = task.getResult();
                                 if (document.exists()) { //아이디가 데이터 베이스에 존재하고
                                     if(document.getString("userPwd").equals(password.getText().toString())) { //비밀번호가 일치하면
-                                        Toast.makeText(SignActivity.this, "로그인에 성공했습니다.", Toast.LENGTH_SHORT).show();
                                         Intent homeIntent;
                                         if(document.getString("position").equals("1")) { //사장님이 로그인하면
                                             homeIntent = new Intent(getApplicationContext(), com.example.hairnawa.MainActivity.class);  //사장님 홈으로 이동
                                         }
                                         else {
                                             homeIntent = new Intent(getApplicationContext(), com.example.hairnawa.MainActivity_customer.class);  //고객님 홈으로 이동
+                                        }
+                                        if(cb_login.isChecked()) { //자동 로그인 CheckBox를 선택했다면
+                                            SaveSharedPreference.setUserName(SignActivity.this, id.getText().toString()); //자동 로그인 설정
                                         }
                                         homeIntent.putExtra("id", id.getText().toString()); //ID값을 전달함
                                         startActivity(homeIntent);

@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:ems="14"
         android:hint="아이디"
-        android:inputType="text" />
+        android:privateImeOptions="defaultInputmode=english" />
 
     <EditText
         android:id="@+id/loginPassword"
@@ -45,6 +45,13 @@
         android:ems="14"
         android:hint="비밀번호"
         android:inputType="textPassword"/>
+
+    <CheckBox
+        android:id="@+id/cb_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="18"
+        android:text="자동 로그인"/>
 
     <Button
         android:id="@+id/login"
