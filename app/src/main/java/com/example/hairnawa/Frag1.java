@@ -230,7 +230,7 @@ public class Frag1 extends Fragment {
                                 entries.add(new Entry((long)document.getData().get("month"), (long)(document.getData().get("price"))));
                             }
                         }
-                        graphDrawing(entries, labels, "매출");
+                        graphDrawing(entries, labels, "월별 매출");
                     }
                 });
     }
@@ -249,7 +249,7 @@ public class Frag1 extends Fragment {
                                 entries.add(new Entry((long)document.getData().get("month"), (long)(document.getData().get("customer"))));
                             }
                         }
-                        graphDrawing(entries, labels, "고객수");
+                        graphDrawing(entries, labels, "월별 고객 수");
                     }
                 });
     }
@@ -269,7 +269,7 @@ public class Frag1 extends Fragment {
                                 entries.add(new Entry((long)document.getData().get("month"), averageSales));
                             }
                         }
-                        graphDrawing(entries, labels, "인당 평균매출");
+                        graphDrawing(entries, labels, "월별 인당 평균 매출");
                     }
                 });
     }

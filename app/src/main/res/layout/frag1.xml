@@ -36,7 +36,7 @@
                 android:id="@+id/averageSales"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="인당 평균매출"
+                android:text="ARPU"
                 android:layout_weight="1"
                 android:background="@drawable/nonclicked_border"/>
 

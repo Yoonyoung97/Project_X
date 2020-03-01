@@ -1,11 +1,14 @@
 package com.example.hairnawa;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +40,7 @@ public class Frag3 extends Fragment {
     private static int numberOfReservation = 0;
     private static Vector<String> strDate = new Vector<>(), price = new Vector<>();
     private static Vector<ArrayList<String>> surgery = new Vector<>();
+    private ScrollView scrollView;
 
     final FirebaseFirestore db = FirebaseFirestore.getInstance(); //파이어스토어
 
@@ -50,6 +54,7 @@ public class Frag3 extends Fragment {
         date = view.findViewById(R.id.date);
         description = view.findViewById(R.id.description);
         expandableListView = view.findViewById(R.id.listView);
+        scrollView = view.findViewById(R.id.sv_scroll);
 
         Date currentTime = Calendar.getInstance().getTime();
         InitializeData(new SimpleDateFormat("yyyy.MM.dd").format(currentTime));
@@ -125,8 +130,8 @@ public class Frag3 extends Fragment {
                                                             surgery.remove(0).toString(), //서비스
                                                             documentSnapshot.getString("phone-number"), //폰번호
                                                             price.remove(0))); //가격
-                                                    if(strDate.isEmpty()) { //모든 예약을 reservationDataList에 추가했을 때
-                                                        expandableListView.setAdapter(new ParentAdapter(getContext(), reservationDataList)); //없으면 실행 잘 안됨
+                                                    if(strDate.isEmpty()) { //모든 예약을 reservationDataList에 추가했을 때 ?
+                                                        expandableListView.setAdapter(new ParentAdapter(getContext(), reservationDataList)); //없으면 실행 잘 안됨 ㅠ
                                                     }
                                                 } else {
                                                     Toast.makeText(getContext(), "데이터가 없습니다.", Toast.LENGTH_SHORT).show();
@@ -138,8 +143,25 @@ public class Frag3 extends Fragment {
                         } //for (QueryDocumentSnapshot document : queryDocumentSnapshots)
                         expandableListView.setAdapter(new ParentAdapter(getContext(), reservationDataList)); //데이터가 없을 때
                         description.setText(numberOfReservation + "개의 예약이 있습니다.");
+                        getListViewHeight();
                     } //public void onEvent
                 }); //colRef. ... .addSnapshotListener(new EventListener<QuerySnapshot>()
     } //public void InitializeData
+
+    public void getListViewHeight(){
+        ViewGroup.LayoutParams params = expandableListView.getLayoutParams();               //ScrollView 때문에 ExpandableListView의 height를 설정함
+        params.height = numberOfReservation * 700; //layout 높이 가져오고 싶었는데 못함..      //ScrollView 안하면 달력이 너무 커서
+        expandableListView.setLayoutParams(params);                                         //ExpandableListView 보기가 힘듦
+        expandableListView.requestLayout();                                                 //ex.폰이 작거나 글씨체가 큰 폰
+        new Handler().postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                //여기에 딜레이 후 시작할 작업들을 입력
+                scrollView.fullScroll(View.FOCUS_UP); //ListView의 높이를 설정하고나면 스크롤이 아래로 내려가있어서 올림
+            }
+        }, 100);// 0.1초 정도 딜레이를 준 후 시작 //느리긴한데 다른 방안 모르겠음 ㅠ
+    }
 }
 
