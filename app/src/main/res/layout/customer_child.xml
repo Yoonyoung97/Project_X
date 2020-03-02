@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="402dp"
+    android:layout_height="110dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="33dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/const2"
+            android:layout_width="63dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:text="마지막 방문일자"
+            android:textColor="#000000"
+            android:textSize="15sp" />
+
+        <Space
+            android:layout_width="88dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/lastdate"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="2020-02-25"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:layout_margin="8dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/const3"
+            android:layout_width="45dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:text="마지막 받은 시술"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:layout_margin="4dp"
+            />
+
+        <Space
+            android:layout_width="16dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/procedure"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="파마"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:layout_margin="8dp"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Space
+            android:layout_width="101dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="메세지"
+            android:background="@drawable/button"/>
+
+        <Button
+            android:id="@+id/call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="전화"
+
+            android:background="@drawable/button"/>
+    </LinearLayout>
+
+</LinearLayout>

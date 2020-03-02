@@ -5,14 +5,56 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/bottomNavi5"
-        android:textSize="30sp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/Total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="전체고객"
+            android:background="@drawable/button"
+            />
+
+        <Button
+            android:id="@+id/Newbe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="신규고객"
+            android:background="@drawable/button"/>
+
+        <Button
+            android:id="@+id/old"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="단골고객"
+            android:background="@drawable/button"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="line"
+        android:textSize="18dp"
         android:textColor="#000000"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_margin="10dp"/>
+
+        />
+
+    <ExpandableListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:groupIndicator="@null"
+        android:divider ="@null"
+        />
 
 </LinearLayout>

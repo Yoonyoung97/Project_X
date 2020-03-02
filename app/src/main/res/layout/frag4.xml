@@ -1,18 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <TextView
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/chart"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/bottomNavi4"
-        android:textSize="30sp"
-        android:textColor="#000000"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_margin="10dp"/>
+        android:layout_height="256dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/total"
+            android:layout_width="30dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/button"
+            android:text="전체"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/positive"
+            android:layout_width="30dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/button"
+            android:text="긍정"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/negative"
+            android:layout_width="30dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/button"
+            android:text="부정"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/comentListview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp" />
 
 </LinearLayout>
