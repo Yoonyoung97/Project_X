@@ -15,6 +15,7 @@
         android:paddingTop="25dp"
         android:text=""
         android:textSize="43px"
+        android:textColor="#7C4DFF"
         app:layout_constraintBottom_toTopOf="@+id/frameLayout"
         android:singleLine="true" />
 
@@ -33,7 +34,7 @@
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chart"
             android:layout_width="match_parent"
-            android:layout_height="256dp" />
+            android:layout_height="230dp" />
         <TextView
             android:id="@+id/tvContent"
             android:layout_width="wrap_content"
@@ -61,7 +62,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:hint="@string/Dailys"
+            android:text="@string/Dailys"
             app:layout_constraintBottom_toTopOf="@+id/Weeklys"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -74,7 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:hint="@string/Weeklys"
+            android:text="@string/Weeklys"
             app:layout_constraintBottom_toTopOf="@+id/Monthlys"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -87,7 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:hint="@string/Monthlys"
+            android:text="@string/Monthlys"
             app:layout_constraintBottom_toTopOf="@+id/Annuals"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -100,7 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:hint="@string/Annuals"
+            android:text="@string/Annuals"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

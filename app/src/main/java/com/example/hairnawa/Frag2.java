@@ -3,12 +3,14 @@ package com.example.hairnawa;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,8 +24,19 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class Frag2 extends Fragment {
@@ -31,6 +44,15 @@ public class Frag2 extends Fragment {
     private LineChart lineChart;
     private Button dailys, weeklys, monthlys, annuals;
     private TextView titleText;
+    private static List<Entry> entries = new ArrayList<>();
+    private static ArrayList<String> labels = new ArrayList<>();
+    private static ArrayList<Long> price = new ArrayList<>();
+
+    final FirebaseFirestore db = FirebaseFirestore.getInstance(); //파이어스토어
+    final DocumentReference docRef = db.collection("User")
+            .document("2ttvmnVOCqVtiwyWPMzf") //사장님 아이디로 바꿔야함
+            .collection("shop")
+            .document("5NrbvMcs1XzQVOenQaec");
 
     @Nullable
     @Override
@@ -45,7 +67,7 @@ public class Frag2 extends Fragment {
 
         //lineChart = findViewById(R.id.chart);
 
-        List<Entry> entries = new ArrayList<>();
+        entries = new ArrayList<>();
         entries.add(new Entry(1,0f));
         entries.add(new Entry(2,0f));
         entries.add(new Entry(3,1f));
@@ -60,7 +82,7 @@ public class Frag2 extends Fragment {
         entries.add(new Entry(12,8f));
 
 
-        final ArrayList<String> labels = new ArrayList<>();
+        labels = new ArrayList<>();
         labels.add("January");
         labels.add("February");
         labels.add("March");
@@ -220,135 +242,158 @@ public class Frag2 extends Fragment {
             monthlys.setSelected(false);
             annuals.setSelected(false);
 
-            if (view.getId() == R.id.Dailys) {
+            if (view.getId() == R.id.Dailys) { //일간 현황 버튼을 클릭했을 때
                 dailys.setSelected(true);
-
-                String day = "일간";
                 titleText.setText(getString(R.string.Dailys));
+                entries = new ArrayList<>();
+                price = new ArrayList<>();
+                for(int i = 0; i < 8; i++)
+                    price.add(i, (long)0);
 
-                List<Entry> entries = new ArrayList<>();
-                entries.add(new Entry(1, 2f));
-                entries.add(new Entry(2, 2f));
-                entries.add(new Entry(3, 3f));
-                entries.add(new Entry(4, 4f));
-                entries.add(new Entry(5, 6f));
-                entries.add(new Entry(6, 9f));
-                entries.add(new Entry(7, 3f));
-                entries.add(new Entry(8, 4f));
-                entries.add(new Entry(9, 5f));
-                entries.add(new Entry(10, 7f));
-                entries.add(new Entry(11, 10f));
-                entries.add(new Entry(12, 8f));
-                entries.add(new Entry(13, 5f));
-                entries.add(new Entry(14, 6f));
-                entries.add(new Entry(15, 8f));
-                entries.add(new Entry(16, 7f));
-                entries.add(new Entry(17, 9f));
-                entries.add(new Entry(18, 1f));
-                entries.add(new Entry(19, 1f));
-                entries.add(new Entry(20, 2f));
-                entries.add(new Entry(21, 0f));
-                entries.add(new Entry(22, 0f));
-                entries.add(new Entry(23, 0f));
-                entries.add(new Entry(24, 3f));
+                Calendar mCalendar = Calendar.getInstance();
+                final Date today = mCalendar.getTime(); //오늘
+                mCalendar.add(Calendar.HOUR, -mCalendar.HOUR);
+                mCalendar.add(Calendar.MINUTE, -mCalendar.MINUTE);
+                mCalendar.add(Calendar.SECOND, -mCalendar.SECOND);
+                final Date day0 = mCalendar.getTime(); //오늘 0시
+                mCalendar.add(Calendar.DAY_OF_WEEK, -1);
+                final Date day1 = mCalendar.getTime(); //1일 전
+                mCalendar.add(Calendar.DAY_OF_WEEK, -1);
+                final Date day2 = mCalendar.getTime(); //2일 전
+                mCalendar.add(Calendar.DAY_OF_WEEK, -1);
+                final Date day3 = mCalendar.getTime(); //3일 전
+                mCalendar.add(Calendar.DAY_OF_WEEK, -1);
+                final Date day4 = mCalendar.getTime(); //4일 전
+                mCalendar.add(Calendar.DAY_OF_WEEK, -1);
+                final Date day5 = mCalendar.getTime(); //5일 전
+                mCalendar.add(Calendar.DAY_OF_WEEK, -1);
+                final Date day6 = mCalendar.getTime(); //6일 전
+                mCalendar.add(Calendar.DAY_OF_WEEK, -1);
+                final Date day7 = mCalendar.getTime(); //7일 전
+
+                docRef.collection("reservation")
+                        .whereGreaterThanOrEqualTo("time", day7) //일주일 전부터
+                        .whereLessThanOrEqualTo("time", today) //오늘까지
+                        .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Toast.makeText(getContext(), "데이터를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                    if (document.get("price") != null) {
+                                        Date getDate = document.getDate("time");
+                                        if (getDate.getTime() < day6.getTime())                                                 //일주일 전이면
+                                            price.set(0, price.get(0) + (long)(document.getData().get("price")));
+                                        else if (day6.getTime() <= getDate.getTime() && getDate.getTime() < day5.getTime())     //6일 전이면
+                                            price.set(1, price.get(1) + (long)(document.getData().get("price")));
+                                        else if (day5.getTime() <= getDate.getTime() && getDate.getTime() < day4.getTime())     //5일 전이면
+                                            price.set(2, price.get(2) + (long)(document.getData().get("price")));
+                                        else if (day4.getTime() <= getDate.getTime() && getDate.getTime() < day3.getTime())     //4일 전이면
+                                            price.set(3, price.get(3) + (long)(document.getData().get("price")));
+                                        else if (day3.getTime() <= getDate.getTime() && getDate.getTime() < day2.getTime())     //3일 전이면
+                                            price.set(4, price.get(4) + (long)(document.getData().get("price")));
+                                        else if (day2.getTime() <= getDate.getTime() && getDate.getTime() < day1.getTime())     //2일 전이면
+                                            price.set(5, price.get(5) + (long)(document.getData().get("price")));
+                                        else if (day1.getTime() <= getDate.getTime() && getDate.getTime() < day0.getTime())     //1일 전이면
+                                            price.set(6, price.get(6) + (long)(document.getData().get("price")));
+                                        else if (day0.getTime() <= getDate.getTime())                                           //오늘이면
+                                            price.set(7, price.get(7) + (long)(document.getData().get("price")));
+                                    }
+                                }
+                                for(int i = 0; i < 8; i++)
+                                    entries.add(new Entry(i - 7, price.get(i)));
+                                graphDrawing(entries, labels, "일간 ( 0 : 오늘 ), ( -1 : 하루 전 )");
+                            }
+                        });
 
 
-                final ArrayList<String> labels = new ArrayList<>();
-                labels.add("AM 1h");
-                labels.add("AM 2h");
-                labels.add("AM 3h");
-                labels.add("AM 4h");
-                labels.add("AM 5h");
-                labels.add("AM 6h");
-                labels.add("AM 7h");
-                labels.add("AM 8h");
-                labels.add("AM 9h");
-                labels.add("AM 10h");
-                labels.add("AM 11h");
-                labels.add("AM 12h");
-                labels.add("PM 1h");
-                labels.add("PM 2h");
-                labels.add("PM 3h");
-                labels.add("PM 4h");
-                labels.add("PM 5h");
-                labels.add("PM 6h");
-                labels.add("PM 7h");
-                labels.add("PM 8h");
-                labels.add("PM 9h");
-                labels.add("PM 10h");
-                labels.add("PM 11h");
-                labels.add("PM 12h");
-
-
-                graphDrawing(entries, labels, day);
             }
 
-            if (view.getId() == R.id.Weeklys) {
+            if (view.getId() == R.id.Weeklys) { //주간 현황 버튼을 클릭했을 때
                 weeklys.setSelected(true);
-
-                String week = "주간";
                 titleText.setText(getString(R.string.Weeklys));
+                entries = new ArrayList<>();
+                price = new ArrayList<>();
+                for(int i = 0; i < 6; i++)
+                    price.add(i, (long)0);
 
-                List<Entry> entries = new ArrayList<>();
-                entries.add(new Entry(1, 0f));
-                entries.add(new Entry(2, 0f));
-                entries.add(new Entry(3, 1f));
-                entries.add(new Entry(4, 4f));
-                entries.add(new Entry(5, 10f));
-                entries.add(new Entry(6, 4f));
-                entries.add(new Entry(7, 4f));
+                Calendar mCalendar = Calendar.getInstance();
+                final Date today = mCalendar.getTime(); //오늘
+                mCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                final Date week0 = mCalendar.getTime(); //이번주 월요일
+                mCalendar.add(Calendar.DAY_OF_WEEK, -7);
+                final Date week1 = mCalendar.getTime(); //1주 전
+                mCalendar.add(Calendar.DAY_OF_WEEK, -7);
+                final Date week2 = mCalendar.getTime(); //2주 전
+                mCalendar.add(Calendar.DAY_OF_WEEK, -7);
+                final Date week3 = mCalendar.getTime(); //3주 전
+                mCalendar.add(Calendar.DAY_OF_WEEK, -7);
+                final Date week4 = mCalendar.getTime(); //4주 전
+                mCalendar.add(Calendar.DAY_OF_WEEK, -7);
+                final Date week5 = mCalendar.getTime(); //5주 전
 
-
-                final ArrayList<String> labels = new ArrayList<>();
-                labels.add("Mon");
-                labels.add("Tues");
-                labels.add("Wed");
-                labels.add("Thurs");
-                labels.add("Fri");
-                labels.add("Sat");
-                labels.add("Sun");
-
-                graphDrawing(entries, labels, week);
+                docRef.collection("reservation")
+                        .whereGreaterThan("time", week5) //5주 전부터
+                        .whereLessThanOrEqualTo("time", today) //오늘까지
+                        //.orderBy("time")
+                        .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Toast.makeText(getContext(), "데이터를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                    if (document.get("price") != null) {
+                                        Date getDate = document.getDate("time");
+                                        if (getDate.getTime() < week4.getTime()) {                                                 //5주 전 ~ 4주 전이면
+                                            price.set(0, price.get(0) + (long)(document.getData().get("price")));
+                                        } else if (week4.getTime() <= getDate.getTime() && getDate.getTime() < week3.getTime()) {   //4주 전 ~ 3주 전이면
+                                            price.set(1, price.get(1) + (long)(document.getData().get("price")));
+                                        } else if (week3.getTime() <= getDate.getTime() && getDate.getTime() < week2.getTime()) {   //3주 전 ~ 2주 전이면
+                                            price.set(2, price.get(2) + (long)(document.getData().get("price")));
+                                        } else if (week2.getTime() <= getDate.getTime() && getDate.getTime() < week1.getTime()) {   //2주 전 ~ 1주 전이면
+                                            price.set(3, price.get(3) + (long)(document.getData().get("price")));
+                                        } else if (week1.getTime() <= getDate.getTime() && getDate.getTime() < week0.getTime()) {   //1주 전 ~ 이번주 월요일
+                                            price.set(4, price.get(4) + (long)(document.getData().get("price")));
+                                        } else if (week0.getTime() <= getDate.getTime()) {                                           //이번주 월요일 ~ 오늘
+                                            price.set(5, price.get(5) + (long)(document.getData().get("price")));
+                                        }
+                                    }
+                                }
+                                for(int i = 0; i < 6; i++) {
+                                    entries.add(new Entry(i - 5, price.get(i)));
+                                }
+                                graphDrawing(entries, labels, "주간 ( 0 : 이번 주 ), ( -1 : 1주 전 )");
+                            }
+                        });
             }
 
             if (view.getId() == R.id.Monthlys) {
                 monthlys.setSelected(true);
+                entries = new ArrayList<>();
 
-
-                String month = "월간";
                 titleText.setText(getString(R.string.Monthlys));
 
-                List<Entry> entries = new ArrayList<>();
-                entries.add(new Entry(1, 0f));
-                entries.add(new Entry(2, 0f));
-                entries.add(new Entry(3, 1f));
-                entries.add(new Entry(4, 4f));
-                entries.add(new Entry(5, 10f));
-                entries.add(new Entry(6, 4f));
-                entries.add(new Entry(7, 4f));
-                entries.add(new Entry(8, 5f));
-                entries.add(new Entry(9, 8f));
-                entries.add(new Entry(10, 7f));
-                entries.add(new Entry(11, 10f));
-                entries.add(new Entry(12, 8f));
-
-
-                final ArrayList<String> labels = new ArrayList<>();
-                labels.add("January");
-                labels.add("February");
-                labels.add("March");
-                labels.add("April");
-                labels.add("May");
-                labels.add("June");
-                labels.add("July");
-                labels.add("August");
-                labels.add("September");
-                labels.add("October");
-                labels.add("November");
-                labels.add("December");
-
-
-                graphDrawing(entries, labels, month);
+                docRef.collection("record")
+                        .orderBy("month")
+                        .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Toast.makeText(getContext(), "데이터를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                    if (document.get("price") != null && document.get("month") != null) {
+                                        entries.add(new Entry((long)document.getData().get("month"), (long)(document.getData().get("price"))));
+                                    }
+                                }
+                                graphDrawing(entries, labels, "월간");
+                            }
+                        });
             }
 
             if (view.getId() == R.id.Annuals) {
@@ -357,7 +402,7 @@ public class Frag2 extends Fragment {
                 String years = "연간";
                 titleText.setText(getString(R.string.Annuals));
 
-                List<Entry> entries = new ArrayList<>();
+                entries = new ArrayList<>();
                 entries.add(new Entry(1, 246f));
                 entries.add(new Entry(2, 259f));
                 entries.add(new Entry(3, 777f));
@@ -365,7 +410,7 @@ public class Frag2 extends Fragment {
                 entries.add(new Entry(5, 449f));
 
 
-                final ArrayList<String> labels = new ArrayList<>();
+                labels = new ArrayList<>();
                 labels.add("2019");
                 labels.add("2020");
                 labels.add("2021");
