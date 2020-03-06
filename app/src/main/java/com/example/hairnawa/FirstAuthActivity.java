@@ -4,11 +4,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class FirstAuthActivity extends AppCompatActivity {
 
     private Intent intent;
+    private String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,10 +29,31 @@ public class FirstAuthActivity extends AppCompatActivity {
             this.finish();
         } else {
             // Call Next Activity
-            intent = new Intent(FirstAuthActivity.this, MainActivity.class);
-            intent.putExtra("STD_NUM", SaveSharedPreference.getUserName(this).toString());
-            startActivity(intent);
-            this.finish();
+            id = SaveSharedPreference.getUserName(this).toString();
+            final FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("User")
+                    .document(id)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    if(document.getString("position").equals("1")){
+                                        intent = new Intent(getApplicationContext(), com.example.hairnawa.MainActivity.class);
+                                    } else {
+                                        intent = new Intent(getApplicationContext(), com.example.hairnawa.MainActivity_customer.class);
+                                    }
+                                    intent.putExtra("id", id);
+                                    startActivity(intent);
+                                    finish();
+
+                                }
+
+                            }
+                        }
+                    });
         }
     }
 }

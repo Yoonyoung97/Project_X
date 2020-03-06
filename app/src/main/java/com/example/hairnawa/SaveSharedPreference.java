@@ -16,7 +16,7 @@ public class SaveSharedPreference {
     public static void setUserName(Context ctx, String userName) {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
         editor.putString(PREF_USER_NAME, userName);
-        editor.commit();
+        editor.apply();
     }
 
     // 저장된 정보 가져오기
@@ -28,6 +28,6 @@ public class SaveSharedPreference {
     public static void clearUserName(Context ctx) {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
         editor.clear();
-        editor.commit();
+        editor.apply();
     }
 }
